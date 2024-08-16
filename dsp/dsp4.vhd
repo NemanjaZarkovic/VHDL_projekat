@@ -7,7 +7,7 @@ entity dsp4 is
           FIXED_SIZE : integer := 48);          
     port (clk: in std_logic;
           rst: in std_logic;
-          u1_i: in signed(FIXED_SIZE - 1 downto 0);
+          u1_i: in std_logic_vector(FIXED_SIZE - 1 downto 0);
           spacing : in std_logic_vector(FIXED_SIZE - 1 downto 0);
           res_o: out std_logic_vector(FIXED_SIZE - 1 downto 0));
 end dsp4;
@@ -15,7 +15,7 @@ end dsp4;
 architecture Behavioral of dsp4 is
     attribute use_dsp : string;
     attribute use_dsp of Behavioral : architecture is "yes";
-
+    
     signal u1_reg: signed(FIXED_SIZE - 1 downto 0);
     signal u2_reg: signed(FIXED_SIZE - 1 downto 0);
     signal res_reg: signed(2*FIXED_SIZE - 1 downto 0);
@@ -28,7 +28,7 @@ begin
                 u2_reg <= (others => '0');
                 res_reg <= (others => '0');
             else
-                u1_reg <= u1_i;
+                u1_reg <= signed(u1_i);
                 u2_reg <= signed(spacing);
                 res_reg <= u1_reg * u2_reg;
             end if;

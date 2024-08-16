@@ -1,3 +1,5 @@
+
+
 -- Operation : step * temp_3 - frac
 library ieee;
 use ieee.std_logic_1164.all;
@@ -12,9 +14,9 @@ entity dsp3 is
         clk : in  std_logic;    
         rst : in std_logic;
         u1_i : in std_logic_vector(WIDTH - 1 downto 0); -- step
-        u2_i : in signed (FIXED_SIZE -1 downto 0); -- temp_3
+        u2_i : in std_logic_vector (FIXED_SIZE -1 downto 0); -- temp_3
         u3_i : in std_logic_vector(FIXED_SIZE - 1 downto 0); -- frac
-        res_o : out signed(FIXED_SIZE -1 downto 0) -- temp_4
+        res_o : out std_logic_vector(FIXED_SIZE -1 downto 0) -- temp_4
        );
 end dsp3;
 
@@ -31,7 +33,7 @@ architecture Behavioral of dsp3 is
 
 
     begin
-
+    
     process(clk)
      begin
       if rising_edge(clk) then
@@ -45,7 +47,7 @@ architecture Behavioral of dsp3 is
              --reg_res <=(others => '0');
          else
              u1_reg <= signed(u1_i);
-             u2_reg <= u2_i;
+             u2_reg <= signed(u2_i);
              u3_reg <= signed(u3_i);
              mult <= u1_reg * u2_reg;
              res_reg <= mult;
@@ -55,8 +57,8 @@ architecture Behavioral of dsp3 is
          end if;
       end if;
     end process;
-
+    
     -- Type conversion for output
-    res_o <= resize(sub, FIXED_SIZE);
-
+    res_o <= std_logic_vector(resize(sub, FIXED_SIZE));
+    
     end Behavioral;
