@@ -27,7 +27,7 @@ end fsm;
 architecture Behavioral of fsm is
     type state_type is (
         idle, StartLoop, InnerLoop, NextSample,IncrementI, 
-        ComputeRPos1,       
+        ComputeRPos1, WaitForResult1,     
         Finish
     );
     signal state_reg, state_next : state_type;
@@ -36,7 +36,9 @@ architecture Behavioral of fsm is
     signal j_reg, j_next : unsigned(WIDTH - 1 downto 0);
     
     signal temp1_rpos_reg, temp1_rpos_next : std_logic_vector(FIXED_SIZE - 1 downto 0);
+    signal temp1_rpos_delayed, temp1_rpos_delayed1 : std_logic_vector(FIXED_SIZE - 1 downto 0);
     
+
     signal done : std_logic;
     component dsp1 is
     generic (
@@ -48,7 +50,7 @@ architecture Behavioral of fsm is
         rst : in std_logic;
         u1_i : in std_logic_vector(WIDTH - 1 downto 0); 
         u2_i : in std_logic_vector(WIDTH - 1 downto 0); 
-        u3_i : in std_logic_vector(FIXED_SIZE - 1 downto 0); 
+        u3_i : in std_logic_vector(FIXED_SIZE - 1 downto 0);
         res_o : out std_logic_vector(FIXED_SIZE -1 downto 0)
         );
     end component;
@@ -74,7 +76,19 @@ begin
         u1_i => std_logic_vector(i_reg),
         u2_i => std_logic_vector(iradius),
         u3_i => i_cose,
-        res_o => temp1_rpos_reg);
+        res_o => temp1_rpos_delayed);
+    
+    delay_temp1_rpos: entity work.delay
+    generic map (
+        DELAY_CYCLES => 3,
+        SIGNAL_WIDTH => FIXED_SIZE
+    )
+    port map (
+        clk => clk,
+        rst => reset,
+        din => temp1_rpos_delayed,  -- Signal sa DSP-a
+        dout => temp1_rpos_delayed1  -- Signal nakon kasnjenja
+    ); 
 
     -- Sekvencijalni proces za registre
     process (clk)
@@ -82,34 +96,35 @@ begin
         if (rising_edge(clk)) then
             if (reset ='1') then
                 state_reg <= idle;
-                --Resetovanje svih signala na pocetne vrednosti
+                -- Resetovanje svih signala na početne vrednosti
                 i_reg <= (others =>'0');
                 j_reg <= (others => '0');
-            
                 temp1_rpos_reg <= (others => '0');
-            
-                
             else
-                state_reg <= state_next;
-                --Azuriranje registara sa internim signalima
-                i_reg <= i_next;
-                j_reg <= j_next;
-                
-                temp1_rpos_reg <= temp1_rpos_next;
-                
-                ready_o <= '0';
+                if (state_reg = ComputeRPos1 and (temp1_rpos_reg /= temp1_rpos_delayed1 or temp1_rpos_reg = (temp1_rpos_reg'range => '0'))) then
+                    temp1_rpos_reg <= temp1_rpos_delayed1;
+                else
+                    state_reg <= state_next;
+                    -- Ažuriranje registara sa internim signalima
+                    i_reg <= i_next;
+                    j_reg <= j_next;
+                    temp1_rpos_reg <= temp1_rpos_next;
+                end if;
             end if;            
         end if;
     end process;
+
     -- Kombinacioni proces za odredjivanje sledecih stanja i vrednosti signala
-    process(state_reg, start_i, i_reg,j_reg, temp1_rpos_reg, iradius, fracr, i_cose)
+    process(state_reg, start_i, i_reg,j_reg, temp1_rpos_reg, iradius, fracr, i_cose, temp1_rpos_delayed1)
     begin
         --Default assigments
         state_next <= state_reg;
         i_next <= i_reg;
         j_next <= j_reg;
         
-        temp1_rpos_next <= temp1_rpos_reg;
+        temp1_rpos_next <= temp1_rpos_delayed1;
+        
+        ready_o <= '0';  -- Default ready_o to '0' unless in idle state
         
         --Logika za FSM
         case state_reg is
@@ -129,12 +144,13 @@ begin
             when InnerLoop =>
                 state_next <= ComputeRPos1;
             
-            when ComputeRPos1 => 
+            when ComputeRPos1 =>
                 temp1_rpos_next <= temp1_rpos_reg;
-                state_next <= NextSample;   
+                state_next <= NextSample;
+                
             when NextSample =>
                 j_next <= j_reg + 1;
-            if (j_next >= to_unsigned(2 * to_integer(iradius), WIDTH)) then
+            if (j_next >= to_unsigned(2 * to_integer(iradius) - 1, WIDTH)) then
                 state_next <= IncrementI;
             else
                 state_next <= InnerLoop;
@@ -142,7 +158,7 @@ begin
             
             when IncrementI =>
                 i_next <= i_reg + 1;
-            if (i_next >= to_unsigned(2 * to_integer(iradius), WIDTH)) then
+            if (i_next >= to_unsigned(2 * to_integer(iradius) - 1, WIDTH)) then
                 state_next <= Finish;
             else
                 state_next <= StartLoop;
