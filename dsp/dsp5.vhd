@@ -28,7 +28,7 @@ architecture Behavioral of dsp5 is
     signal sub : signed(FIXED_SIZE - 1 downto 0);
 
     begin
-
+    
     process(clk)
      begin
       if rising_edge(clk) then
@@ -49,10 +49,10 @@ architecture Behavioral of dsp5 is
          end if;
       end if;
     end process;
-
+    
     -- Type conversion for output
 
     res_o <= std_logic_vector(sub);
 
-
+    
     end Behavioral;

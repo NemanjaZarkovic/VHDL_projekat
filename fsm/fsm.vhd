@@ -96,7 +96,7 @@ begin
         if (rising_edge(clk)) then
             if (reset ='1') then
                 state_reg <= idle;
-                -- Resetovanje svih signala na početne vrednosti
+                -- Resetovanje svih signala na po?etne vrednosti
                 i_reg <= (others =>'0');
                 j_reg <= (others => '0');
                 temp1_rpos_reg <= (others => '0');

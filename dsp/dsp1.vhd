@@ -7,8 +7,8 @@ use ieee.numeric_std.all;
 entity dsp1 is
   generic (
            WIDTH : integer := 11; 
-           FIXED_SIZE : integer := 48;
-           ADD_SUB : string:= "add" 
+           FIXED_SIZE : integer := 48
+          -- ADD_SUB : string:= "add" 
           );
   port (
         clk : in  std_logic;     -- Clock
@@ -16,7 +16,7 @@ entity dsp1 is
         u1_i : in std_logic_vector(WIDTH - 1 downto 0); -- i/j
         u2_i : in std_logic_vector(WIDTH - 1 downto 0); --iradius
         u3_i : in std_logic_vector(FIXED_SIZE - 1 downto 0); -- i_cose/i_sine
-        res_o : out signed(FIXED_SIZE -1 downto 0) -- Output
+        res_o : out std_logic_vector(FIXED_SIZE -1 downto 0) -- Output
        );
 end dsp1;
 
@@ -43,21 +43,21 @@ architecture Behavioral of dsp1 is
              mult <= (others => '0');
              res_reg <= (others => '0');
          else
-             if(ADD_SUB = "add")then
-                 u1_reg <= signed(u1_i);
-                 u2_reg <= signed(u2_i);
-                 u3_reg <= signed(u3_i);
-                 sub <= u1_reg + u2_reg;
-                 mult <= sub * u3_reg;
-                 res_reg <= mult;
-             else
+             --if(ADD_SUB = "add")then
                  u1_reg <= signed(u1_i);
                  u2_reg <= signed(u2_i);
                  u3_reg <= signed(u3_i);
                  sub <= u1_reg - u2_reg;
                  mult <= sub * u3_reg;
                  res_reg <= mult;
-             end if; 
+--             else
+--                 u1_reg <= signed(u1_i);
+--                 u2_reg <= signed(u2_i);
+--                 u3_reg <= signed(u3_i);
+--                 sub <= u1_reg - u2_reg;
+--                 mult <= sub * u3_reg;
+--                 res_reg <= mult;
+--             end if; 
          end if;
       end if;
     end process;
@@ -65,7 +65,7 @@ architecture Behavioral of dsp1 is
     --
     -- Type conversion for output
     --
-    res_o <= res_reg(FIXED_SIZE- 1 downto 0);
+    res_o <= std_logic_vector(res_reg(FIXED_SIZE- 1 downto 0));
     --res_o <= resize(p, FIXED_SIZE);
 
     end Behavioral;
