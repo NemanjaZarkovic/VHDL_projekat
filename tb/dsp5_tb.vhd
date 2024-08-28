@@ -51,8 +51,17 @@ begin
 
         -- Test case 1
         -- Example values for u1_i (rpos), u2_i (_IndexSize / 2.0), and u3_i (0.5)
-        u1_i <= std_logic_vector(to_signed(4, FIXED_SIZE));  -- Example: rpos = 100000
-        u2_i <= std_logic_vector(to_signed(3, FIXED_SIZE));   -- Example: _IndexSize / 2.0 = 50000
+        u1_i <= "000000000000000000000000000000001010000011000010"; --  0.15699263069083616 u binarnom format
+        u2_i <= std_logic_vector(to_signed(4*131072, FIXED_SIZE));
+        u3_i <=std_logic_vector(to_signed(131072, FIXED_SIZE));     
+
+        -- Wait for a few clock cycles to allow processing
+        wait for clk_period * 5;
+        
+        -- Test case 1
+        -- Example values for u1_i (rpos), u2_i (_IndexSize / 2.0), and u3_i (0.5)
+        u1_i <= "000000000000000000000000000000001010000011000000"; --  0.15699263069083616 u binarnom format
+        u2_i <= std_logic_vector(to_signed(8*131072, FIXED_SIZE));
         u3_i <=std_logic_vector(to_signed(4*131072, FIXED_SIZE));     
 
         -- Wait for a few clock cycles to allow processing

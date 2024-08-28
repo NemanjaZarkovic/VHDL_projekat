@@ -24,7 +24,8 @@ architecture Behavioral of dsp5 is
     signal u1_reg : signed(FIXED_SIZE - 1 downto 0);
     signal u2_reg : signed(FIXED_SIZE - 1 downto 0);
     signal u3_reg : signed(FIXED_SIZE - 1 downto 0);
-    signal add, res_reg : signed(FIXED_SIZE - 1  downto 0);
+    signal u4_reg : signed(FIXED_SIZE - 1 downto 0);
+    signal add: signed(FIXED_SIZE - 1  downto 0);
     signal sub : signed(FIXED_SIZE - 1 downto 0);
 
     begin
@@ -36,16 +37,16 @@ architecture Behavioral of dsp5 is
              u1_reg <= (others => '0');
              u2_reg <= (others => '0');
              u3_reg <= (others => '0');
+             u4_reg <= (others => '0');
              add <= (others => '0');
              sub <= (others => '0');
-             res_reg <= (others => '0');
          else
              u1_reg <= signed(u1_i);
              u2_reg <= signed(u2_i);
              u3_reg <= signed(u3_i);
+             u4_reg <= u3_reg;
              add <= u1_reg + u2_reg;
-             res_reg <= add;
-             sub <= add - u3_reg;
+             sub <= add - u4_reg;
          end if;
       end if;
     end process;
