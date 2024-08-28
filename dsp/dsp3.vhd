@@ -1,7 +1,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all; 
-
+--Operation step * (i_cose * (i - iradius) + i_sine * (j - iradius)) - fracr
+--step * temp_3 -frac         
 entity dsp3 is
   generic (
            WIDTH : integer := 11;  
@@ -42,20 +43,16 @@ begin
                 res_reg <= (others => '0');
                 sub <= (others => '0');
             else
-                -- Register inputs
                 u1_reg <= signed(u1_i);
                 u2_reg <= signed(u2_i);
                 u3_reg <= signed(u3_i);
                 u4_reg <= resize(u3_reg, FIXED_SIZE + WIDTH); 
-                
-                -- Perform operations
                 res_reg <= u1_reg * u2_reg;
                 sub <= res_reg - u4_reg;
             end if;
         end if;
     end process;
     
-    -- Type conversion for output
     res_o <= std_logic_vector(sub(FIXED_SIZE- 1 downto 0));
     
 end Behavioral;
