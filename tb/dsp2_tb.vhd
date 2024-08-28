@@ -11,9 +11,10 @@ architecture Behavioral of dsp2_tb is
     -- Signals for the DUT (Device Under Test)
     signal clk : std_logic := '0';
     signal rst : std_logic := '1';
-    signal u1_i : signed(FIXED_SIZE - 1 downto 0) := (others => '0');
-    signal u2_i : signed(FIXED_SIZE - 1 downto 0) := (others => '0');
-    signal res_o : signed(FIXED_SIZE - 1 downto 0);
+    signal u1_i : std_logic_vector(FIXED_SIZE - 1 downto 0) := (others => '0');
+    signal u2_i : std_logic_vector(FIXED_SIZE - 1 downto 0) := (others => '0');
+    signal ADD_SUB : std_logic := '0';  -- '0' for add, '1' for subtract
+    signal res_o : std_logic_vector(FIXED_SIZE - 1 downto 0);
     
     -- Clock period definition
     constant clk_period : time := 10 ns;
@@ -29,16 +30,19 @@ begin
             rst => rst,
             u1_i => u1_i,
             u2_i => u2_i,
+            ADD_SUB => ADD_SUB,
             res_o => res_o
         );
 
     -- Clock process definitions
-    clk_process :process
+    clk_process : process
     begin
-        clk <= '0';
-        wait for clk_period / 2;
-        clk <= '1';
-        wait for clk_period / 2;
+        while true loop
+            clk <= '0';
+            wait for clk_period / 2;
+            clk <= '1';
+            wait for clk_period / 2;
+        end loop;
     end process;
 
     -- Stimulus process
@@ -48,31 +52,22 @@ begin
         wait for 20 ns;
         rst <= '0';
 
-        -- Test case 1
-        u1_i <= to_signed(100, FIXED_SIZE);
-        u2_i <= to_signed(50, FIXED_SIZE);
-        wait for clk_period * 100;
-        report "Value of res_o after Test case 1: " & integer'image(to_integer(res_o));
+        -- Test case 1: Addition
+        ADD_SUB <= '0';  -- Perform addition
+        u1_i <= "000000000000000000000000000000001010000011000010"; --  0.15699263069083616 u binarnom format
+        u2_i <= "000000000000000000000000000011001110101000000100"; -- 3.2285336566057454 u binarnom formatu
+        wait for clk_period * 5;
+        report "Value of res_o after Test case 1 (Addition): " & integer'image(to_integer(signed(res_o)));
 
-        -- Test case 2
-        u1_i <= to_signed(-100, FIXED_SIZE);
-        u2_i <= to_signed(100, FIXED_SIZE);
-        wait for clk_period * 10;
-        report "Value of res_o after Test case 2: " & integer'image(to_integer(res_o));
-
---        -- Test case 3
---        u1_i <= to_signed(123456789, FIXED_SIZE);
---        u2_i <= to_signed(-987654321, FIXED_SIZE);
---        wait for clk_period * 10;
---        report "Value of res_o after Test case 3: " & integer'image(to_integer(res_o));
-
---        -- Test case 4
---        u1_i <= to_signed(500, FIXED_SIZE);
---        u2_i <= to_signed(700, FIXED_SIZE);
---        wait for clk_period * 10;
---        report "Value of res_o after Test case 4: " & integer'image(to_integer(res_o));
+        -- Test case 2: Subtraction
+        ADD_SUB <= '1';  -- Perform subtraction
+        u1_i <= "000000000000000000000000000000111001110101110010"; -- 0.90375518798828125 u binarnom formatu
+        u2_i <= "000000000000000000000000000000011100110110110110"; --  0.45089018167010253 u binarnom formatu
+        wait for clk_period * 5;
+        report "Value of res_o after Test case 2 (Subtraction): " & integer'image(to_integer(signed(res_o)));
 
         -- End simulation
         wait;
     end process;
+
 end Behavioral;
