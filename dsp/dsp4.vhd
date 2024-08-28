@@ -1,7 +1,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
--- Operation : r/cpos=temp_3*spacing
+-- Operation : r/cpos= temp_4 * spacing dxx = weight * (dxx1 - dxx2); rweight1 = dx * (1.0 - rfrac);
 entity dsp4 is
     generic ( 
           FIXED_SIZE : integer := 48);          
@@ -34,6 +34,5 @@ begin
             end if;
         end if;
     end process;
-    --res_o <= std_logic_vector(res_reg);
     res_o <= std_logic_vector(res_reg(2*FIXED_SIZE - 30 - 1 downto 18));
 end Behavioral;
