@@ -11,9 +11,8 @@ architecture Behavioral of dsp4_tb is
     -- Signals for the DUT (Device Under Test)
     signal clk : std_logic := '0';
     signal rst : std_logic := '1';
-    signal u1_i : signed(FIXED_SIZE - 1 downto 0) := (others => '0');
+    signal u1_i : std_logic_vector(FIXED_SIZE - 1 downto 0) := (others => '0');
     signal spacing : std_logic_vector(FIXED_SIZE - 1 downto 0) := (others => '0');
-    --signal res_o : std_logic_vector(2*FIXED_SIZE-1 downto 0);
     signal res_o : std_logic_vector(FIXED_SIZE - 1 downto 0);
 
     -- Clock period definition
@@ -50,7 +49,6 @@ begin
         rst <= '0';
 
         -- Test case 1
-       -- u1_i <= "000000000000000000000000001001101011111000001110";
          u1_i <= "000000000000000000000000001000101011111000001110";
         spacing <= std_logic_vector(to_signed(4*131072, FIXED_SIZE));
         wait for clk_period * 2;

@@ -1,15 +1,15 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
--- Operation : temp_3*spacing
+-- Operation : r/cpos=temp_3*spacing
 entity dsp4 is
     generic ( 
           FIXED_SIZE : integer := 48);          
     port (clk: in std_logic;
           rst: in std_logic;
-          u1_i: in std_logic_vector(FIXED_SIZE - 1 downto 0);
-          spacing : in std_logic_vector(FIXED_SIZE - 1 downto 0);
-          res_o: out std_logic_vector(FIXED_SIZE - 1 downto 0));
+          u1_i: in std_logic_vector(FIXED_SIZE - 1 downto 0); --temp_3
+          spacing : in std_logic_vector(FIXED_SIZE - 1 downto 0);--spacing
+          res_o: out std_logic_vector(FIXED_SIZE - 1 downto 0));--rpos and cpos
 end dsp4;
 
 architecture Behavioral of dsp4 is
