@@ -2,7 +2,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
--- Operation : temp_1 + temp_2
+-- Operation : rfrac=rx-ri 
 
 entity dsp6 is
     generic (
@@ -12,18 +12,18 @@ entity dsp6 is
     port (clk: in std_logic;
           rst: in std_logic;
           u1_i: in std_logic_vector(FIXED_SIZE - 1 downto 0); --rx
-          u2_i: in std_logic_vector(WIDTH - 1 downto 0); -- i_sine * (j - iradius), temp_2
-          res_o: out std_logic_vector(FIXED_SIZE - 1 downto 0));-- temp_3
+          u2_i: in std_logic_vector(WIDTH - 1 downto 0); -- ri, iy, ix
+          ADD_SUB : in std_logic; -- '0' for add, '1' for subtract
+          res_o: out std_logic_vector(FIXED_SIZE - 1 downto 0));-- rfrac
 end dsp6;
 
 architecture Behavioral of dsp6 is
     attribute use_dsp : string;
     attribute use_dsp of Behavioral : architecture is "yes";
-    -- ako treba dodaj 2 registra za ulaze
-    constant zero_vector : unsigned(18-1 downto 0) := (others => '0');
+    constant zero_vector1 : unsigned(19-1 downto 0) := (others => '0');
+    constant zero_vector2 : unsigned(18-1 downto 0) := (others => '0');
     signal u1_reg: signed(FIXED_SIZE - 1 downto 0);  
-    signal u2_reg: unsigned(WIDTH - 1 downto 0);
-    signal u3_reg: unsigned(FIXED_SIZE - 1 downto 0);
+    signal u2_reg: unsigned(FIXED_SIZE - 1 downto 0);
     signal res_reg: signed(FIXED_SIZE - 1 downto 0);
 begin
     process(clk) is
@@ -35,9 +35,12 @@ begin
                 res_reg <= (others => '0');
             else
                 u1_reg <= signed(u1_i);
-                u2_reg <= unsigned(u2_i);
-                u3_reg <= resize(u2_reg & zero_vector, FIXED_SIZE);
-                res_reg <= u1_reg - signed(u3_reg);
+                u2_reg <= zero_vector1 & unsigned(u2_i) & zero_vector2;
+                if (ADD_SUB = '0') then
+                    res_reg <= u1_reg + signed(u2_reg);
+                else
+                    res_reg <= u1_reg - signed(u2_reg);
+                end if;                
             end if;
         end if;
     end process;
