@@ -1,0 +1,1 @@
+savedcmd_/home/nemanja/Desktop/nemanja/projekat/msreal/Module.symvers :=  scripts/mod/modpost -M -m -a      -o /home/nemanja/Desktop/nemanja/projekat/msreal/Module.symvers -T /home/nemanja/Desktop/nemanja/projekat/msreal/modules.order -i Module.symvers -e 

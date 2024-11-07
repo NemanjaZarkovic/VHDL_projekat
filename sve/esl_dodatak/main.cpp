@@ -2,8 +2,8 @@
 #include <iostream>
 
 // Constants
-const int ARRAY_SIZE = 1000;
-const int FIFO_SIZE = 333;
+const int ARRAY_SIZE = 100;
+const int FIFO_SIZE = 33;
 
 // DMA Module
 SC_MODULE(DMA) {
